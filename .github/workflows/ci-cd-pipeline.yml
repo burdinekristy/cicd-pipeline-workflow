@@ -60,8 +60,8 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-pages-artificat@v3
         with:
-          path: '.' # Uploads your repository root files (like an index.html or your app files)
-
+          path: './public'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
