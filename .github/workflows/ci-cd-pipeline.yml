@@ -39,9 +39,29 @@ jobs:
   deploy:
     needs: build-and-test # Only deploy if tests pass successfully
     runs-on: ubuntu-latest
-    steps:
-    - name: Deploy to Staging
-      run: |
-        echo "All test passed! Deploying application to staging environment..."
-        # Add you actual deployment script or server connection commands here
 
+    # Grants permissions required to deploy to GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artificat@v3
+        with:
+          path: '.' # Uploads your repository root files (like an index.html or your app files)
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
