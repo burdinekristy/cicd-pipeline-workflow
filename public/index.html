@@ -5,20 +5,268 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>College GameDay</title>
     <style>
-        body {
-            font-family: Arial,sans-serif;
-            text-align: center;
-            padding-top: 50px;
-            background-color: #f4f4f9;
-            color: #333;
+        :root {
+            --ink: #17202a;
+            --muted: #66717d;
+            --cream: #f7f1e5;
+            --paper: #fffdf8;
+            --red: #c94c3b;
+            --gold: #e6b84b;
+            --line: #e5dccd;
         }
-        h1 {
-            color: #2c3e50;
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background: var(--cream);
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        header {
+            padding: 28px clamp(20px, 6vw, 90px) 22px;
+            background: var(--ink);
+            color: var(--paper);
+            border-bottom: 5px solid var(--gold);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .brand h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); letter-spacing: 0; }
+        .brand p { margin: 6px 0 0; color: #d8d3ca; font-family: Arial, sans-serif; }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            max-width: 1180px;
+            margin: 24px auto 0;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        nav button {
+            flex: 0 0 auto;
+            border: 1px solid #59616a;
+            border-radius: 4px;
+            padding: 10px 14px;
+            color: var(--paper);
+            background: transparent;
+            cursor: pointer;
+            font: 700 0.78rem Arial, sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        nav button:hover, nav button.active { background: var(--red); border-color: var(--red); }
+
+        main { max-width: 1180px; margin: 0 auto; padding: 42px clamp(20px, 6vw, 90px) 70px; }
+        .view { display: none; animation: appear 180ms ease-out; }
+        .view.active { display: block; }
+        @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+        .intro { max-width: 700px; margin-bottom: 30px; }
+        .intro h2 { margin: 0 0 8px; font-size: clamp(2rem, 4vw, 3.2rem); }
+        .intro p { margin: 0; color: var(--muted); font: 1rem/1.6 Arial, sans-serif; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+        .panel { padding: 22px; background: var(--paper); border: 1px solid var(--line); border-top: 4px solid var(--red); box-shadow: 0 8px 20px rgba(23, 32, 42, 0.06); }
+        .panel h3 { margin: 0 0 10px; font-size: 1.35rem; }
+        .panel p, .panel li { color: var(--muted); font: 0.95rem/1.5 Arial, sans-serif; }
+        .panel ul { margin: 0; padding-left: 18px; }
+        .score { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line); font: 700 0.95rem Arial, sans-serif; }
+        .score:last-child { border-bottom: 0; }
+        .tag { color: var(--red); font: 700 0.72rem Arial, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+        .choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 18px; }
+        .choice, .action { border: 1px solid var(--line); border-radius: 4px; padding: 13px 15px; background: var(--paper); color: var(--ink); cursor: pointer; font: 700 0.9rem Arial, sans-serif; }
+        .choice:hover, .choice.selected, .action { background: var(--red); border-color: var(--red); color: white; }
+        .action { display: inline-block; margin-top: 12px; }
+        .field { display: grid; gap: 7px; margin-top: 14px; font: 700 0.8rem Arial, sans-serif; }
+        input, select { width: 100%; border: 1px solid var(--line); border-radius: 4px; padding: 12px; color: var(--ink); background: white; font: 1rem Arial, sans-serif; }
+        .message { min-height: 24px; margin: 15px 0 0; color: var(--red); font: 700 0.9rem Arial, sans-serif; }
+        .item-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); font: 0.95rem Arial, sans-serif; }
+        .item-row:last-child { border-bottom: 0; }
+        .item-row button { border: 0; background: transparent; color: var(--red); cursor: pointer; font-weight: 700; }
+        .stack { display: grid; gap: 16px; }
+        .team-toolbar { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 18px; }
+        .checkout { display: none; margin-top: 16px; }
+        .checkout.visible { display: block; }
+        .total { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 2px solid var(--ink); font: 700 1rem Arial, sans-serif; }
+        .confirmation { display: none; margin-top: 16px; padding: 16px; background: #e8f1e5; border-left: 4px solid #4b7d55; color: #285536; font: 700 0.95rem/1.5 Arial, sans-serif; }
+        .confirmation.visible { display: block; }
+        code { padding: 3px 5px; background: #eee8dc; border-radius: 3px; font: 0.9rem monospace; }
+        @media (max-width: 600px) {
+            header { padding-top: 22px; }
+            .brand { align-items: flex-start; }
+            .brand span { font-size: 2rem !important; }
+            main { padding-top: 30px; }
+            .panel { padding: 18px; }
+            .score { align-items: flex-start; flex-direction: column; gap: 4px; }
         }
     </style>
 </head>
 <body>
-    <h1>College GameDay</h1>
-    <p>Your College GameDay site is live.</p>
+    <header>
+        <div class="brand">
+            <div>
+                <h1>College GameDay</h1>
+                <p>Your Saturday starts here.</p>
+            </div>
+            <span aria-hidden="true" style="font-size: 3rem; color: var(--gold);">★</span>
+        </div>
+        <nav aria-label="Main navigation">
+            <button class="active" data-view="home">Home</button>
+            <button data-view="teams">Teams</button>
+            <button data-view="schedule">Schedule</button>
+            <button data-view="scores">Live Scores</button>
+            <button data-view="predictions">Predictions</button>
+            <button data-view="tailgate">Tailgate</button>
+            <button data-view="store">Store</button>
+            <button data-view="trivia">Trivia</button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="view active" id="home">
+            <div class="intro"><span class="tag">Saturday central</span><h2>Everything college football, in one place.</h2><p>Use the menu to explore teams, games, scores, predictions, tailgate plans, and trivia.</p></div>
+            <div class="grid">
+                <article class="panel"><h3>Today’s spotlight</h3><p>Alabama vs. Georgia</p><p class="tag">Kickoff 3:30 PM</p></article>
+                <article class="panel"><h3>Fast picks</h3><p>Check the latest matchups and make your game-day prediction.</p></article>
+                <article class="panel"><h3>Tailgate ready</h3><p>Plan supplies, invite friends, and keep your event together.</p></article>
+            </div>
+        </section>
+
+        <section class="view" id="teams"><div class="intro"><span class="tag">Team hub</span><h2>Choose your team.</h2><p>Search all FBS teams or filter them by conference.</p></div><article class="panel"><div class="team-toolbar"><input id="teamSearch" type="search" placeholder="Search teams" aria-label="Search teams"><select id="conferenceFilter" aria-label="Filter by conference"><option value="all">All conferences</option></select></div><div class="choice-grid" id="teamChoices"><p>Loading teams...</p></div><p class="message" id="teamMessage" aria-live="polite"></p></article></section>
+
+        <section class="view" id="schedule"><div class="intro"><span class="tag">Game day calendar</span><h2>Upcoming events.</h2></div><div class="grid"><article class="panel"><h3>College GameDay</h3><p>Saturday · 9:00 AM</p><p>Athens, Georgia</p></article><article class="panel"><h3>Alabama vs. Georgia</h3><p>Saturday · 3:30 PM</p><p>Sanford Stadium</p></article></div></section>
+
+        <section class="view" id="scores"><div class="intro"><span class="tag">Live scores</span><h2>Keep an eye on the action.</h2></div><article class="panel"><div class="score"><span>Alabama 24 - Georgia 21</span><span>Final</span></div><div class="score"><span>Ohio State 17 - Michigan 20</span><span>Q4</span></div><div class="score"><span>Texas 31 - Oklahoma 28</span><span>Final</span></div></article></section>
+
+        <section class="view" id="predictions"><div class="intro"><span class="tag">Make your pick</span><h2>Who takes the win?</h2><p>Make a pick and save it on this device.</p></div><article class="panel"><h3>Alabama vs. Georgia</h3><div class="choice-grid" id="predictionChoices"><button class="choice" data-pick="Alabama">Alabama</button><button class="choice" data-pick="Georgia">Georgia</button></div><label class="field">Predicted score <input id="predictionScore" type="text" inputmode="numeric" placeholder="Example: 27 - 24"></label><button class="action" id="savePrediction">Save prediction</button><p class="message" id="predictionMessage" aria-live="polite"></p></article></section>
+
+        <section class="view" id="tailgate"><div class="intro"><span class="tag">Tailgate planner</span><h2>Bring your crew together.</h2><p>Build a simple plan that stays saved on this device.</p></div><div class="grid"><article class="panel"><h3>Event details</h3><label class="field">Location <input id="tailgateLocation" placeholder="Parking lot or campus spot"></label><label class="field">Time <input id="tailgateTime" placeholder="Saturday at 11:00 AM"></label></article><article class="panel"><h3>Guest list</h3><label class="field">Friend's name <input id="friendName" placeholder="Add a friend"></label><button class="action" id="addFriend">Add friend</button><div id="friendList"></div></article><article class="panel"><h3>Supplies</h3><label class="field">Supply <input id="supplyName" placeholder="Chairs, snacks, cooler"></label><button class="action" id="addSupply">Add supply</button><div id="supplyList"></div></article></div><p class="message" id="tailgateMessage" aria-live="polite"></p></section>
+
+        <section class="view" id="store"><div class="intro"><span class="tag">GameDay store</span><h2>Rep your team.</h2><p>Choose your gear, review your cart, and complete a demo order.</p></div><div class="grid"><article class="panel"><h3>Alabama Jersey</h3><p>$79.99</p><button class="action add-to-cart" data-item="Alabama Jersey" data-price="79.99">Add to cart</button></article><article class="panel"><h3>Georgia Hat</h3><p>$24.99</p><button class="action add-to-cart" data-item="Georgia Hat" data-price="24.99">Add to cart</button></article><article class="panel"><h3>Ohio State Hoodie</h3><p>$59.99</p><button class="action add-to-cart" data-item="Ohio State Hoodie" data-price="59.99">Add to cart</button></article><article class="panel"><h3>Texas Flag</h3><p>$19.99</p><button class="action add-to-cart" data-item="Texas Flag" data-price="19.99">Add to cart</button></article><article class="panel"><h3>Michigan Foam Finger</h3><p>$14.99</p><button class="action add-to-cart" data-item="Michigan Foam Finger" data-price="14.99">Add to cart</button></article><article class="panel"><h3>College GameDay Tee</h3><p>$29.99</p><button class="action add-to-cart" data-item="College GameDay Tee" data-price="29.99">Add to cart</button></article><article class="panel"><h3>Team Scarf</h3><p>$34.99</p><button class="action add-to-cart" data-item="Team Scarf" data-price="34.99">Add to cart</button></article><article class="panel"><h3>Tailgate Cooler</h3><p>$44.99</p><button class="action add-to-cart" data-item="Tailgate Cooler" data-price="44.99">Add to cart</button></article><article class="panel"><h3>GameDay Travel Mug</h3><p>$18.99</p><button class="action add-to-cart" data-item="GameDay Travel Mug" data-price="18.99">Add to cart</button></article><article class="panel"><h3>Team Blanket</h3><p>$49.99</p><button class="action add-to-cart" data-item="Team Blanket" data-price="49.99">Add to cart</button></article><article class="panel"><h3>Penn State Cap</h3><p>$22.99</p><button class="action add-to-cart" data-item="Penn State Cap" data-price="22.99">Add to cart</button></article><article class="panel"><h3>Tailgate Grill</h3><p>$69.99</p><button class="action add-to-cart" data-item="Tailgate Grill" data-price="69.99">Add to cart</button></article><article class="panel"><h3>Your cart</h3><div id="cartList"><p>Your cart is empty.</p></div><div class="total"><span>Total</span><span id="cartTotal">$0.00</span></div><button class="action" id="checkoutButton" type="button" disabled>Checkout</button><p class="message" id="cartMessage" aria-live="polite"></p></article></div><article class="panel checkout" id="checkoutPanel"><h3>Checkout</h3><p>Demo checkout only. No payment is collected.</p><form id="checkoutForm"><label class="field">Full name <input id="customerName" required autocomplete="name"></label><label class="field">Email <input id="customerEmail" type="email" required autocomplete="email"></label><label class="field">Shipping address <input id="customerAddress" required autocomplete="street-address"></label><button class="action" type="submit">Place demo order</button></form><div class="confirmation" id="orderConfirmation" role="status"></div></article></section>
+
+        <section class="view" id="trivia"><div class="intro"><span class="tag">GameDay trivia</span><h2>Test your college football knowledge.</h2><p id="triviaProgress">Question 1 of 4</p></div><article class="panel" id="triviaCard"></article></section>
+    </main>
+
+    <script>
+        const buttons = document.querySelectorAll("nav button");
+        const views = document.querySelectorAll(".view");
+        const showView = (viewName) => {
+            const validView = document.getElementById(viewName) ? viewName : "home";
+            buttons.forEach((item) => item.classList.toggle("active", item.dataset.view === validView));
+            views.forEach((view) => view.classList.toggle("active", view.id === validView));
+        };
+        buttons.forEach((button) => button.addEventListener("click", () => {
+            showView(button.dataset.view);
+            history.replaceState(null, "", `#${button.dataset.view}`);
+        }));
+        showView(location.hash.slice(1));
+
+        let favoriteTeam = localStorage.getItem("gameday-team");
+        const teamChoices = document.getElementById("teamChoices");
+        const teamSearch = document.getElementById("teamSearch");
+        const conferenceFilter = document.getElementById("conferenceFilter");
+        let allTeams = [];
+        const selectTeam = (teamName) => {
+            favoriteTeam = teamName;
+            localStorage.setItem("gameday-team", teamName);
+            teamChoices.querySelectorAll("[data-team]").forEach((item) => item.classList.toggle("selected", item.dataset.team === teamName));
+            document.getElementById("teamMessage").textContent = `${teamName} is now your favorite team.`;
+        };
+        const renderTeams = () => {
+            const search = teamSearch.value.trim().toLowerCase();
+            const conference = conferenceFilter.value;
+            const visibleTeams = allTeams.filter((team) => team.name.toLowerCase().includes(search) && (conference === "all" || team.conference === conference));
+            teamChoices.innerHTML = visibleTeams.length ? visibleTeams.map((team) => `<button class="choice${team.name === favoriteTeam ? " selected" : ""}" data-team="${team.name}">${team.name}<small>${team.conference}</small></button>`).join("") : "<p>No teams match that search.</p>";
+            teamChoices.querySelectorAll("[data-team]").forEach((button) => button.addEventListener("click", () => selectTeam(button.dataset.team)));
+        };
+        fetch("college-gameday/teams.json").then((response) => {
+            if (!response.ok) throw new Error("Team data could not be loaded.");
+            return response.json();
+        }).then((data) => {
+            allTeams = data.teams;
+            [...new Set(allTeams.map((team) => team.conference))].sort().forEach((conference) => conferenceFilter.insertAdjacentHTML("beforeend", `<option value="${conference}">${conference}</option>`));
+            if (favoriteTeam) document.getElementById("teamMessage").textContent = `${favoriteTeam} is your saved favorite.`;
+            renderTeams();
+        }).catch(() => { teamChoices.innerHTML = "<p>Team data could not be loaded. Start the site with a local web server.</p>"; });
+        teamSearch.addEventListener("input", renderTeams);
+        conferenceFilter.addEventListener("change", renderTeams);
+
+        let selectedPick = "";
+        document.querySelectorAll("[data-pick]").forEach((button) => button.addEventListener("click", () => {
+            selectedPick = button.dataset.pick;
+            document.querySelectorAll("[data-pick]").forEach((item) => item.classList.toggle("selected", item === button));
+        }));
+        document.getElementById("savePrediction").addEventListener("click", () => {
+            const score = document.getElementById("predictionScore").value.trim();
+            const message = document.getElementById("predictionMessage");
+            if (!selectedPick || !score) { message.textContent = "Choose a team and enter a score first."; return; }
+            localStorage.setItem("gameday-prediction", `${selectedPick}, ${score}`);
+            message.textContent = `Saved: ${selectedPick} for a predicted score of ${score}.`;
+        });
+
+        const friends = [];
+        const supplies = [];
+        const renderList = (items, elementId) => { document.getElementById(elementId).innerHTML = items.map((item) => `<div class="item-row"><span>${item}</span><button type="button" data-remove="${item}">Remove</button></div>`).join(""); };
+        document.getElementById("addFriend").addEventListener("click", () => { const input = document.getElementById("friendName"); if (input.value.trim()) { friends.push(input.value.trim()); input.value = ""; renderList(friends, "friendList"); document.getElementById("tailgateMessage").textContent = "Friend added to your plan."; } });
+        document.getElementById("addSupply").addEventListener("click", () => { const input = document.getElementById("supplyName"); if (input.value.trim()) { supplies.push(input.value.trim()); input.value = ""; renderList(supplies, "supplyList"); document.getElementById("tailgateMessage").textContent = "Supply added to your plan."; } });
+
+        const cart = [];
+        const renderCart = () => {
+            document.getElementById("cartList").innerHTML = cart.length ? cart.map((item, index) => `<div class="item-row"><span>${item.name} - $${item.price}</span><button type="button" data-cart-index="${index}">Remove</button></div>`).join("") : "<p>Your cart is empty.</p>";
+            const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+            document.getElementById("cartTotal").textContent = `$${total.toFixed(2)}`;
+            document.getElementById("checkoutButton").disabled = cart.length === 0;
+        };
+        document.querySelectorAll(".add-to-cart").forEach((button) => button.addEventListener("click", () => { cart.push({ name: button.dataset.item, price: button.dataset.price }); renderCart(); document.getElementById("cartMessage").textContent = `${button.dataset.item} added to your cart.`; }));
+        document.getElementById("cartList").addEventListener("click", (event) => { if (event.target.dataset.cartIndex) { cart.splice(Number(event.target.dataset.cartIndex), 1); renderCart(); } });
+        document.getElementById("checkoutButton").addEventListener("click", () => { document.getElementById("checkoutPanel").classList.add("visible"); document.getElementById("customerName").focus(); });
+        document.getElementById("checkoutForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            const orderNumber = `CGD-${Date.now().toString().slice(-6)}`;
+            document.getElementById("orderConfirmation").textContent = `Order ${orderNumber} received. Thanks, ${document.getElementById("customerName").value.trim()}! This demo does not charge your card.`;
+            document.getElementById("orderConfirmation").classList.add("visible");
+            cart.length = 0;
+            renderCart();
+            event.target.reset();
+        });
+
+        const questions = [
+            ["Which team is known as the Crimson Tide?", ["Alabama", "Texas", "Georgia"], "Alabama"],
+            ["Which conference does Ohio State belong to?", ["Big Ten", "SEC", "Big 12"], "Big Ten"],
+            ["What is the mascot of the University of Georgia?", ["Bulldog", "Longhorn", "Tiger"], "Bulldog"],
+            ["Which team plays in the Big 12 conference?", ["Texas", "Alabama", "Ohio State"], "Texas"],
+            ["What is the nickname of the University of Michigan team?", ["Wolverines", "Badgers", "Huskies"], "Wolverines"],
+            ["Which school plays at Notre Dame Stadium?", ["Notre Dame", "Pittsburgh", "Syracuse"], "Notre Dame"],
+            ["What color is strongly associated with the Clemson Tigers?", ["Orange", "Purple", "Green"], "Orange"],
+            ["Which team is known as the Buckeyes?", ["Ohio State", "Michigan State", "Iowa"], "Ohio State"],
+            ["What is the mascot of the Texas Longhorns?", ["Bevo", "Smokey", "Uga"], "Bevo"],
+            ["Which school is known as the Seminoles?", ["Florida State", "Florida", "Miami"], "Florida State"],
+            ["Which team plays in Death Valley?", ["Clemson", "Duke", "Wake Forest"], "Clemson"],
+            ["What is the nickname of the Wisconsin team?", ["Badgers", "Boilermakers", "Hawkeyes"], "Badgers"]
+        ];
+        let questionIndex = 0;
+        let triviaScore = 0;
+        const triviaCard = document.getElementById("triviaCard");
+        const renderQuestion = () => {
+            if (questionIndex === questions.length) { triviaCard.innerHTML = `<h3>Final score: ${triviaScore}/${questions.length}</h3><button class="action" id="restartTrivia">Play again</button>`; document.getElementById("triviaProgress").textContent = "Game complete"; document.getElementById("restartTrivia").onclick = () => { questionIndex = 0; triviaScore = 0; renderQuestion(); }; return; }
+            const [question, answers, correctAnswer] = questions[questionIndex];
+            const shuffledAnswers = [...answers].sort(() => Math.random() - 0.5);
+            triviaCard.innerHTML = `<h3>${question}</h3><div class="choice-grid">${shuffledAnswers.map((answer) => `<button class="choice" data-answer="${answer}">${answer}</button>`).join("")}</div><p class="message" id="triviaMessage" aria-live="polite"></p>`;
+            document.getElementById("triviaProgress").textContent = `Question ${questionIndex + 1} of ${questions.length}`;
+            triviaCard.querySelectorAll("[data-answer]").forEach((button) => button.onclick = () => { const correct = button.dataset.answer === correctAnswer; if (correct) triviaScore++; document.getElementById("triviaMessage").textContent = correct ? "Correct!" : `The answer was ${correctAnswer}.`; setTimeout(() => { questionIndex++; renderQuestion(); }, 650); });
+        };
+        renderQuestion();
+    </script>
 </body>
 </html>
