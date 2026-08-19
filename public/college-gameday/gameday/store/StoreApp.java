@@ -22,7 +22,7 @@ public class StoreApp {
             switch (choice) {
                 case "1":
                     System.out.println("\nAvailable Merchandise:");
-                    for (MechItem item : manager.getInventory()) {
+                    for (MerchItem item : manager.getInventory()) {
                         System.out.println("- " + item);
                     }
                     break;

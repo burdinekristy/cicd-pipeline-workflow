@@ -61,7 +61,10 @@ public class TailgatePlanningGUI extends Application {
         addSupplyBtn.setOnAction(e -> {
             if (manager.hasEvent()) {
                 String name = supplyNameField.getText();
-                int qty = Integer.parseInt(supplyField.getText());
+                int qty = Integer.parseInt(supplyQtyField.getText());
+                if (name.isEmpty() || qty <= 0) {
+                    return;
+                }
                 manager.getCurrentEvent().addSupply(new SupplyItem(name, qty));
                 updateSummary();
             }
@@ -79,12 +82,20 @@ public class TailgatePlanningGUI extends Application {
         VBox layout = new VBox(10,
             new Label ("Create Tailgate Event"),
             locationField, timeField, createEventBtn,
-            new Label("Add supplies"), supplyNameField, addFriendBtn,
+            new Label("Add supplies"), supplyNameField, supplyQtyField, addSupplyBtn,
             new Label("Invite Friends"), friendNameField, addFriendBtn,
             new Label("Event Summary"), eventSummary);
 
-            layout.setPadding(new Insets(20));
+        layout.setPadding(new Insets(20));
 
-            Scene scene = new Scene(layout, 400, 600);
+        Scene scene = new Scene(layout, 400, 600);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void updateSummary() {
+        if (manager.hasEvent()) {
+            eventSummary.setText(manager.getCurrentEvent().toString());
+        }
     }
 }

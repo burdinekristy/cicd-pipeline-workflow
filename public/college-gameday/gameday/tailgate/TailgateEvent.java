@@ -38,7 +38,7 @@ public class TailgateEvent {
 
     @Override 
     public String toString() {
-        return "Tailgate at" + location + " at " + time +
+        return "Tailgate at " + location + " at " + time +
                "\nFriends: " + invitedFriends +
                "\nSupplies: " + supplies;
     }

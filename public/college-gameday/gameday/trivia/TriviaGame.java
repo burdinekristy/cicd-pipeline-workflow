@@ -8,7 +8,7 @@ public class TriviaGame {
     private int score;
 
     public TriviaGame() {
-        questions = new ArrayLists<>();
+        questions = new ArrayList<>();
         score = 0;
         loadQuestions();
     }

@@ -5,7 +5,7 @@ import gameday.predictions.PredictionApp;
 import gameday.schedule.ScheduleApp;
 import gameday.scores.ScoreApp;
 import gameday.store.StoreApp;
-import gameday.tailgate.TailgatePlanningGUI;
+import gameday.tailgate.TailgateApp;
 import gameday.teams.TeamSelectionApp;
 import gameday.trivia.TriviaApp;
 
@@ -48,7 +48,7 @@ public class Main {
                     break;
                 case 3:
                     System.out.println("Launching Scores...");
-                    ScroreApp.main(agrs);
+                    ScoreApp.main(args);
                     break;
                 case 4:
                     System.out.println("Launching Predictions...");
@@ -56,7 +56,7 @@ public class Main {
                     break;
                 case 5:
                     System.out.println("Launching Tailgate Planning...");
-                    // TailgatePlanningGUI may use a main method or GUI constructor depending on its setup
+                    TailgateApp.main(args);
                     break;
                 case 6:
                     System.out.println("Launching Store...");

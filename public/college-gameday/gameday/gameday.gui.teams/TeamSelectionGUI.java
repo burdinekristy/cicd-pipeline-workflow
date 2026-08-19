@@ -2,7 +2,7 @@ package gameday.gui.teams;
 
 import gameday.teams.Team;
 import gameday.teams.TeamManager;
-import gameday.application.Applicaton;
+import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -17,14 +17,14 @@ public class TeamSelectionGUI extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Team Selection");
 
-        comboBox<String> teamComboBox = new ComboBox<>();
+        ComboBox<String> teamComboBox = new ComboBox<>();
         for (Team team : teamManager.getTeams()) {
             teamComboBox.getItems().add(team.getName());
         }
 
-        Button selectButton = new selectButton("Select Team");
+        Button selectButton = new Button("Select Team");
         selectButton.setOnAction(e -> {
-            String selectedNone = teamComboBox.getValue();
+            String selectedName = teamComboBox.getValue();
             Team selectedTeam = teamManager.getTeamByName(selectedName);
             if (selectedTeam != null) {
                 teamDetailsLabel.setText(
@@ -39,7 +39,7 @@ public class TeamSelectionGUI extends Application {
         });
 
         VBox layout = new VBox(10);
-        layout.getStyle("-fx-padding: 20; -fx-alignment: center;");
+        layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         layout.getChildren().addAll(new Label("Choose Your Team:"), teamComboBox, selectButton, teamDetailsLabel);
         
         Scene scene = new Scene(layout, 400, 300);

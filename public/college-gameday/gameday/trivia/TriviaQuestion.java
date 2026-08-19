@@ -5,7 +5,7 @@ public class TriviaQuestion {
         return answer;
     }
 
-    private String questions;
+    private String question;
     private String answer;
 
     public TriviaQuestion(String question, String answer) {
